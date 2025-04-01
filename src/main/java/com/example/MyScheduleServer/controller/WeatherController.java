@@ -1,11 +1,13 @@
-package controller;
+package com.example.MyScheduleServer.controller;
 
+import com.example.MyScheduleServer.dto.WeatherDto;
+import com.example.MyScheduleServer.service.WeatherService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import service.WeatherService;
 
 @RequiredArgsConstructor
 @RestController
@@ -17,7 +19,7 @@ public class WeatherController {
   private final String SERVICE_KEY = "%2B4Prahol80blyOZ%2F4erVmmDgGmDb2KbjalyKgd9cRGOE5HvVkBLRetPwt93SXayZiPzA4Huut%2FWmCIwyfJ1mOg%3D%3D";
 
   @GetMapping("/weather")
-  public ResponseEntity<String> getWeatherInfo(
+  public ResponseEntity<List<WeatherDto>> getWeatherInfo(
       @RequestParam("baseDate") String baseDate,
       @RequestParam("baseTime") String baseTime,
       @RequestParam("nx") String nx,
@@ -26,7 +28,7 @@ public class WeatherController {
     String url = API_URL + "?serviceKey=" + SERVICE_KEY + "&numOfRows=900&pageNo=1&dataType=JSON"
         + "&base_date=" + baseDate + "&base_time=" + baseTime + "&nx=" + nx + "&ny=" + ny;
 
-    String response = weatherService.processWeatherData(url);
+    List<WeatherDto> response = weatherService.processWeatherData(url);
     return ResponseEntity.ok(response);
   }
 }
