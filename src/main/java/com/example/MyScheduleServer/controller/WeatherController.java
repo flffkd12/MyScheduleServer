@@ -2,6 +2,7 @@ package com.example.MyScheduleServer.controller;
 
 import com.example.MyScheduleServer.dto.WeatherDto;
 import com.example.MyScheduleServer.service.WeatherService;
+import java.net.MalformedURLException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,11 @@ public class WeatherController {
     String url = API_URL + "?serviceKey=" + SERVICE_KEY + "&numOfRows=900&pageNo=1&dataType=JSON"
         + "&base_date=" + baseDate + "&base_time=" + baseTime + "&nx=" + nx + "&ny=" + ny;
 
-    List<WeatherDto> response = weatherService.processWeatherData(url);
-    return ResponseEntity.ok(response);
+    try {
+      List<WeatherDto> response = weatherService.processWeatherData(url);
+      return ResponseEntity.ok(response);
+    } catch (MalformedURLException e) {
+      return ResponseEntity.badRequest().body(null); // 적합하지 않은 쿼리 파라미터
+    }
   }
 }
