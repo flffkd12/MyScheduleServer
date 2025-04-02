@@ -1,6 +1,8 @@
 package com.example.MyScheduleServer.service;
 
-import com.example.MyScheduleServer.dto.WeatherDto;
+import com.example.MyScheduleServer.dto.WeatherItem;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,7 +17,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class WeatherService {
 
-  public List<WeatherDto> processWeatherData(String url) throws MalformedURLException {
+  public List<WeatherItem> processWeatherData(String url) throws MalformedURLException {
+    List<WeatherItem> weatherItemList = new ArrayList<>();
+
     try {
       URL dataUrl = new URL(url);
       HttpURLConnection conn = (HttpURLConnection) dataUrl.openConnection();
@@ -36,6 +40,17 @@ public class WeatherService {
       }
       rd.close();
       conn.disconnect();
+
+      ObjectMapper objectMapper = new ObjectMapper();
+      JsonNode jsonNode = objectMapper.readTree(sb.toString());
+      JsonNode items = jsonNode.path("response").path("body").path("items").path("item");
+
+      if (items.isArray()) {
+        for (JsonNode item : items) {
+          WeatherItem weatherItem = objectMapper.treeToValue(item, WeatherItem.class);
+          weatherItemList.add(weatherItem);
+        }
+      }
     } catch (MalformedURLException e) {
       throw e;
     } catch (ProtocolException e) {
@@ -47,11 +62,6 @@ public class WeatherService {
       // 네트워크 오류, 시간 초과
     }
 
-    List<WeatherDto> weatherDtoList = new ArrayList<>();
-
-    WeatherDto weatherDto = new WeatherDto("0400", "30", "1", "3", "2", "4", "23");
-    weatherDtoList.add(weatherDto);
-
-    return weatherDtoList;
+    return weatherItemList;
   }
 }

@@ -1,6 +1,6 @@
 package com.example.MyScheduleServer.controller;
 
-import com.example.MyScheduleServer.dto.WeatherDto;
+import com.example.MyScheduleServer.dto.WeatherItem;
 import com.example.MyScheduleServer.service.WeatherService;
 import java.net.MalformedURLException;
 import java.util.List;
@@ -20,7 +20,7 @@ public class WeatherController {
   private final String SERVICE_KEY = "%2B4Prahol80blyOZ%2F4erVmmDgGmDb2KbjalyKgd9cRGOE5HvVkBLRetPwt93SXayZiPzA4Huut%2FWmCIwyfJ1mOg%3D%3D";
 
   @GetMapping("/weather")
-  public ResponseEntity<List<WeatherDto>> getWeatherInfo(
+  public ResponseEntity<List<WeatherItem>> getWeatherInfo(
       @RequestParam("baseDate") String baseDate,
       @RequestParam("baseTime") String baseTime,
       @RequestParam("nx") String nx,
@@ -30,7 +30,7 @@ public class WeatherController {
         + "&base_date=" + baseDate + "&base_time=" + baseTime + "&nx=" + nx + "&ny=" + ny;
 
     try {
-      List<WeatherDto> response = weatherService.processWeatherData(url);
+      List<WeatherItem> response = weatherService.processWeatherData(url);
       return ResponseEntity.ok(response);
     } catch (MalformedURLException e) {
       return ResponseEntity.badRequest().body(null); // 적합하지 않은 쿼리 파라미터
