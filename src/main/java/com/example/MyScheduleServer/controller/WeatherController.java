@@ -5,7 +5,6 @@ import com.example.MyScheduleServer.service.WeatherService;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
-import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -53,11 +52,9 @@ public class WeatherController {
             + "Weather information is available 10 minutes after the requested time, which must be within 24 hours past."));
       }
     } catch (DateTimeParseException e) {
-      // parse
-    } catch (IllegalArgumentException e) {
-      // ofPattern
-    } catch (DateTimeException e) {
-      //10분 빼는 검사  /// 주요 excetion에 대해서 최대 2,3개 쓰고 나머지는 포괄적인 Exception으로 잡자 for 가동성
+      e.printStackTrace();
+      return ResponseEntity.badRequest().body(Map.of("message", "Invalid baseDate or baseTime. "
+          + "Query parameter baseDate must be yyyyMMdd like 20240728 and baseTime must be HHmm like 0500"));
     }
 
     String url = API_URL + "?serviceKey=" + SERVICE_KEY + "&numOfRows=900&pageNo=1&dataType=JSON"
