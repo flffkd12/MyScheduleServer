@@ -23,9 +23,6 @@ public class WeatherController {
 
   private final WeatherService weatherService;
 
-  private final String API_URL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
-  private final String SERVICE_KEY = "%2B4Prahol80blyOZ%2F4erVmmDgGmDb2KbjalyKgd9cRGOE5HvVkBLRetPwt93SXayZiPzA4Huut%2FWmCIwyfJ1mOg%3D%3D";
-
   @GetMapping("/weather")
   public ResponseEntity<Map<String, Object>> getWeatherInfo(
       @RequestParam("baseDate") String baseDate,
@@ -57,9 +54,11 @@ public class WeatherController {
           + "Query parameter baseDate must be yyyyMMdd like 20240728 and baseTime must be HHmm like 0500"));
     }
 
+    final String API_URL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
+    final String SERVICE_KEY = "%2B4Prahol80blyOZ%2F4erVmmDgGmDb2KbjalyKgd9cRGOE5HvVkBLRetPwt93SXayZiPzA4Huut%2FWmCIwyfJ1mOg%3D%3D";
     String url = API_URL + "?serviceKey=" + SERVICE_KEY + "&numOfRows=900&pageNo=1&dataType=JSON"
         + "&base_date=" + baseDate + "&base_time=" + baseTime + "&nx=" + nx + "&ny=" + ny;
-
+    
     try {
       List<WeatherItem> response = weatherService.processWeatherData(url);
       if (response.isEmpty()) {
