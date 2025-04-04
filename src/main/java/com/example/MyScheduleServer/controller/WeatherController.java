@@ -58,7 +58,7 @@ public class WeatherController {
     final String SERVICE_KEY = "%2B4Prahol80blyOZ%2F4erVmmDgGmDb2KbjalyKgd9cRGOE5HvVkBLRetPwt93SXayZiPzA4Huut%2FWmCIwyfJ1mOg%3D%3D";
     String url = API_URL + "?serviceKey=" + SERVICE_KEY + "&numOfRows=900&pageNo=1&dataType=JSON"
         + "&base_date=" + baseDate + "&base_time=" + baseTime + "&nx=" + nx + "&ny=" + ny;
-    
+
     try {
       List<WeatherItem> response = weatherService.processWeatherData(url);
       if (response.isEmpty()) {
@@ -70,15 +70,29 @@ public class WeatherController {
       }
     } catch (MalformedURLException e) {
       e.printStackTrace();
-      return ResponseEntity.badRequest().body(
-          Map.of("message", "Invalid parameter. Check the query parameter format."));
+      System.out.println("Error occurred assigning URL object in processWeatherDate method.");
+      System.out.println("Solution: Check if the URL format is right.");
+
+      return ResponseEntity.internalServerError().body(
+          Map.of("message", "Failed to get data because of invalid URL."));
     } catch (ProtocolException e) {
       e.printStackTrace();
-      // 클라이언트와 서버간 프로토콜 버전 일치 확인
-      // 공공데이터 포탈은 GET만 수신하는데 다른거 썼는지 확인
+      System.out.println(
+          "Error occurred at setRequestMethod() in processWeatherData method.");
+      System.out.println("Solution1: Check if the HTTP version matches with API portal.");
+      System.out.println("Solution2: Verify if used HTTP method is supported by the API portal.");
+
+      return ResponseEntity.internalServerError()
+          .body(Map.of("message", "Failed to get data because of protocol issue."));
     } catch (IOException e) {
       e.printStackTrace();
-      // 네트워크 오류, 시간 초과, 서비스 키 만료, API URL변경
+      System.out.println("Error occurred during IO operations.");
+      System.out.println("Solution1: Check if network connection is available.");
+      System.out.println("Solution2: Check if the service key has expired.");
+      System.out.println("Solution3: Check if request API URL has changed.");
+
+      return ResponseEntity.internalServerError()
+          .body(Map.of("message", "Failed to get data because of IO issues."));
     }
   }
 }
