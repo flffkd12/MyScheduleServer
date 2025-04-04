@@ -60,7 +60,7 @@ public class WeatherController {
         + "&base_date=" + baseDate + "&base_time=" + baseTime + "&nx=" + nx + "&ny=" + ny;
 
     try {
-      List<WeatherItem> response = weatherService.processWeatherData(url);
+      List<WeatherItem> response = weatherService.getWeatherItemList(url);
       if (response.isEmpty()) {
         return ResponseEntity.badRequest().body(Map.of("message",
             "Can't load weather data for this location. Check nx, ny query parameter for valid location."));
@@ -70,7 +70,7 @@ public class WeatherController {
       }
     } catch (MalformedURLException e) {
       e.printStackTrace();
-      System.out.println("Error occurred assigning URL object in processWeatherDate method.");
+      System.out.println("Error occurred assigning URL object in getWeatherItemList method.");
       System.out.println("Solution: Check if the URL format is right.");
 
       return ResponseEntity.internalServerError().body(
@@ -78,7 +78,7 @@ public class WeatherController {
     } catch (ProtocolException e) {
       e.printStackTrace();
       System.out.println(
-          "Error occurred at setRequestMethod() in processWeatherData method.");
+          "Error occurred at setRequestMethod() in getWeatherItemList method.");
       System.out.println("Solution1: Check if the HTTP version matches with API portal.");
       System.out.println("Solution2: Verify if used HTTP method is supported by the API portal.");
 

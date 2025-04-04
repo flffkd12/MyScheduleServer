@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class WeatherDto {
 
+  private final String date;
   private final String time;
   private final String rainProbability;
   private final String rainCode;

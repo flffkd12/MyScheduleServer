@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class WeatherService {
 
-  public List<WeatherItem> processWeatherData(String url)
+  public List<WeatherItem> getWeatherItemList(String url)
       throws MalformedURLException, ProtocolException, IOException {
 
     URL dataUrl = new URL(url);
