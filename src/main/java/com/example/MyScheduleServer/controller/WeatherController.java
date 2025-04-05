@@ -45,6 +45,7 @@ public class WeatherController {
       LocalDateTime requestedDateTime = LocalDateTime.parse(baseDate + baseTime,
           DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
       LocalDateTime now = LocalDateTime.now();
+
       if (requestedDateTime.isAfter(now.minusMinutes(10)) || requestedDateTime.isBefore(
           now.minusDays(1))) {
         return ResponseEntity.badRequest().body(Map.of("message", "Invalid baseDate or baseTime. "
@@ -63,7 +64,6 @@ public class WeatherController {
 
     try {
       List<WeatherItem> weatherItemList = weatherService.getWeatherItemList(url);
-
       if (weatherItemList.isEmpty()) {
         return ResponseEntity.badRequest().body(Map.of("message",
             "Can't load weather data for this location. Check nx, ny query parameter for valid location."));
@@ -76,12 +76,11 @@ public class WeatherController {
       System.out.println("Error occurred assigning URL object in getWeatherItemList method.");
       System.out.println("Solution: Check if the URL format is right.");
 
-      return ResponseEntity.internalServerError().body(
-          Map.of("message", "Failed to get data because of invalid URL."));
+      return ResponseEntity.internalServerError()
+          .body(Map.of("message", "Failed to get data because of invalid URL."));
     } catch (ProtocolException e) {
       e.printStackTrace();
-      System.out.println(
-          "Error occurred at setRequestMethod() in getWeatherItemList method.");
+      System.out.println("Error occurred at setRequestMethod() in getWeatherItemList method.");
       System.out.println("Solution1: Check if the HTTP version matches with API portal.");
       System.out.println("Solution2: Verify if used HTTP method is supported by the API portal.");
 
