@@ -1,10 +1,8 @@
 package com.example.MyScheduleServer.dto;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 public class WeatherItem {
 
   private String baseDate;

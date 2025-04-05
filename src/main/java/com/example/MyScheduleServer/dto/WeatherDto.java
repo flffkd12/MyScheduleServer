@@ -1,8 +1,5 @@
 package com.example.MyScheduleServer.dto;
 
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor
 public class WeatherDto {
 
   public String date;
