@@ -100,12 +100,12 @@ public class WeatherController {
 
   private List<WeatherDto> convertToWeatherDto(List<WeatherItem> weatherItemList) {
     List<WeatherDto> weatherDtoList = new ArrayList<>();
-    List<List<WeatherItem>> chunkedWeatherItemList = splitWeatherItemList(weatherItemList);
+    List<List<WeatherItem>> chunkedWeatherItemList = chunkWeatherItemList(weatherItemList);
 
-    for (List<WeatherItem> splitedWeatherItemList : chunkedWeatherItemList) {
+    for (List<WeatherItem> eachWeatherItemList : chunkedWeatherItemList) {
       WeatherDto weatherDto = new WeatherDto();
 
-      for (WeatherItem weatherItem : splitedWeatherItemList) {
+      for (WeatherItem weatherItem : eachWeatherItemList) {
         weatherDto.date = weatherItem.getFcstDate();
         weatherDto.time = weatherItem.getFcstTime();
 
@@ -137,7 +137,7 @@ public class WeatherController {
     return weatherDtoList;
   }
 
-  private List<List<WeatherItem>> splitWeatherItemList(List<WeatherItem> weatherItemList) {
+  private List<List<WeatherItem>> chunkWeatherItemList(List<WeatherItem> weatherItemList) {
     List<List<WeatherItem>> chunkedWeatherItemList = new ArrayList<>();
     List<WeatherItem> tempChunkList = new ArrayList<>();
 
