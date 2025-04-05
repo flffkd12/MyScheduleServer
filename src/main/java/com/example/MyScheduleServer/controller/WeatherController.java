@@ -1,13 +1,16 @@
 package com.example.MyScheduleServer.controller;
 
+import com.example.MyScheduleServer.dto.WeatherDto;
 import com.example.MyScheduleServer.dto.WeatherItem;
 import com.example.MyScheduleServer.service.WeatherService;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +36,9 @@ public class WeatherController {
     List<String> validBaseTime = List.of("0200", "0500", "0800", "1100", "1400", "1700", "2000",
         "2300");
     if (!validBaseTime.contains(baseTime)) {
-      return ResponseEntity.badRequest()
-          .body(Map.of("message",
-              "Invalid baseTime query parameter. baseTime must be one of: " + Arrays.toString(
-                  validBaseTime.toArray())));
+      return ResponseEntity.badRequest().body(Map.of("message",
+          "Invalid baseTime query parameter. baseTime must be one of: " + Arrays.toString(
+              validBaseTime.toArray())));
     }
 
     try {
@@ -60,13 +62,14 @@ public class WeatherController {
         + "&base_date=" + baseDate + "&base_time=" + baseTime + "&nx=" + nx + "&ny=" + ny;
 
     try {
-      List<WeatherItem> response = weatherService.getWeatherItemList(url);
-      if (response.isEmpty()) {
+      List<WeatherItem> weatherItemList = weatherService.getWeatherItemList(url);
+
+      if (weatherItemList.isEmpty()) {
         return ResponseEntity.badRequest().body(Map.of("message",
             "Can't load weather data for this location. Check nx, ny query parameter for valid location."));
       } else {
-        // 데이터가 존재하니 데이터에 대한 가공
-        return ResponseEntity.ok(Map.of("data", response));
+        List<WeatherDto> weatherDtoList = convertToWeatherDto(weatherItemList);
+        return ResponseEntity.ok(Map.of("data", weatherDtoList));
       }
     } catch (MalformedURLException e) {
       e.printStackTrace();
@@ -94,5 +97,74 @@ public class WeatherController {
       return ResponseEntity.internalServerError()
           .body(Map.of("message", "Failed to get data because of IO issues."));
     }
+  }
+
+  private List<WeatherDto> convertToWeatherDto(List<WeatherItem> weatherItemList) {
+    List<WeatherDto> weatherDtoList = new ArrayList<>();
+    List<List<WeatherItem>> chunkedWeatherItemList = splitWeatherItemList(weatherItemList);
+
+    for (List<WeatherItem> splitedWeatherItemList : chunkedWeatherItemList) {
+      WeatherDto weatherDto = new WeatherDto();
+
+      for (WeatherItem weatherItem : splitedWeatherItemList) {
+        weatherDto.date = weatherItem.getFcstDate();
+        weatherDto.time = weatherItem.getFcstTime();
+
+        switch (weatherItem.getCategory()) {
+          case "POP":
+            weatherDto.rainProbability = weatherItem.getFcstValue();
+            break;
+          case "PTY":
+            weatherDto.rainCode = weatherItem.getFcstValue();
+            break;
+          case "PCP":
+            weatherDto.rainAmount = weatherItem.getFcstValue();
+            break;
+          case "SNO":
+            weatherDto.snowAmount = weatherItem.getFcstValue();
+            break;
+          case "SKY":
+            weatherDto.skyCode = weatherItem.getFcstValue();
+            break;
+          case "TMP":
+            weatherDto.temperature = weatherItem.getFcstValue();
+            break;
+        }
+      }
+
+      weatherDtoList.add(weatherDto);
+    }
+
+    return weatherDtoList;
+  }
+
+  private List<List<WeatherItem>> splitWeatherItemList(List<WeatherItem> weatherItemList) {
+    List<List<WeatherItem>> chunkedWeatherItemList = new ArrayList<>();
+    List<WeatherItem> tempChunkList = new ArrayList<>();
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+    LocalDate lastDate = LocalDate.parse(weatherItemList.getFirst().getBaseDate(), formatter)
+        .plusDays(3);
+
+    WeatherItem weatherItem;
+    WeatherItem nextWeatherItem;
+    int weatherItemListIndex = 0;
+
+    do {
+      weatherItem = weatherItemList.get(weatherItemListIndex);
+      nextWeatherItem = weatherItemList.get(weatherItemListIndex + 1);
+
+      tempChunkList.add(weatherItem);
+
+      if (!weatherItem.getFcstTime().equals(nextWeatherItem.getFcstTime())) {
+        chunkedWeatherItemList.add(new ArrayList<>(tempChunkList));
+        tempChunkList.clear();
+      }
+
+      weatherItemListIndex++;
+    } while (!(lastDate.equals(LocalDate.parse(weatherItem.getFcstDate(), formatter))
+        && weatherItem.getFcstTime().equals("0100")));
+
+    return chunkedWeatherItemList;
   }
 }

@@ -1,18 +1,16 @@
 package com.example.MyScheduleServer.dto;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
-@RequiredArgsConstructor
-@Getter
+@NoArgsConstructor
 public class WeatherDto {
 
-  private final String date;
-  private final String time;
-  private final String rainProbability;
-  private final String rainCode;
-  private final String rainAmount;
-  private final String snowAmount;
-  private final String skyCode;
-  private final String temperature;
+  public String date;
+  public String time;
+  public String rainProbability;
+  public String rainCode;
+  public String rainAmount;
+  public String snowAmount;
+  public String skyCode;
+  public String temperature;
 }
