@@ -5,9 +5,9 @@ public class WeatherDto {
   public String date;
   public String time;
   public String rainProbability;
-  public String rainCode;
+  public Integer rainCode;
   public String rainAmount;
   public String snowAmount;
-  public String skyCode;
+  public Integer skyCode;
   public String temperature;
 }

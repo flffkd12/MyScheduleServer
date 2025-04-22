@@ -114,7 +114,7 @@ public class WeatherController {
             weatherDto.rainProbability = weatherItem.getFcstValue();
             break;
           case "PTY":
-            weatherDto.rainCode = weatherItem.getFcstValue();
+            weatherDto.rainCode = Integer.valueOf(weatherItem.getFcstValue());
             break;
           case "PCP":
             weatherDto.rainAmount = weatherItem.getFcstValue();
@@ -123,7 +123,7 @@ public class WeatherController {
             weatherDto.snowAmount = weatherItem.getFcstValue();
             break;
           case "SKY":
-            weatherDto.skyCode = weatherItem.getFcstValue();
+            weatherDto.skyCode = Integer.valueOf(weatherItem.getFcstValue());
             break;
           case "TMP":
             weatherDto.temperature = weatherItem.getFcstValue();
