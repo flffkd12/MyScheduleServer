@@ -59,7 +59,7 @@ public class WeatherController {
 
     final String API_URL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
     final String SERVICE_KEY = "%2B4Prahol80blyOZ%2F4erVmmDgGmDb2KbjalyKgd9cRGOE5HvVkBLRetPwt93SXayZiPzA4Huut%2FWmCIwyfJ1mOg%3D%3D";
-    String url = API_URL + "?serviceKey=" + SERVICE_KEY + "&numOfRows=900&pageNo=1&dataType=JSON"
+    String url = API_URL + "?serviceKey=" + SERVICE_KEY + "&numOfRows=1500&pageNo=1&dataType=JSON"
         + "&base_date=" + baseDate + "&base_time=" + baseTime + "&nx=" + nx + "&ny=" + ny;
 
     try {
@@ -141,13 +141,32 @@ public class WeatherController {
     List<List<WeatherItem>> chunkedWeatherItemList = new ArrayList<>();
     List<WeatherItem> tempChunkList = new ArrayList<>();
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-    LocalDate lastDate = LocalDate.parse(weatherItemList.getFirst().getBaseDate(), formatter)
-        .plusDays(3);
+    // 현재 시각의 날씨 정보를 가진 인덱스로 이동
+    int weatherItemListIndex = 0;
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+    LocalDateTime nowDateTime = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
+
+    while (weatherItemListIndex < weatherItemList.size()) {
+      WeatherItem item = weatherItemList.get(weatherItemListIndex);
+      String dateTimeStr = item.getFcstDate() + item.getFcstTime();
+      LocalDateTime itemDateTime = LocalDateTime.parse(dateTimeStr, dateTimeFormatter);
+
+      if (!itemDateTime.isBefore(nowDateTime)) {
+        System.out.println(itemDateTime);
+        System.out.println(nowDateTime);
+        break;
+      }
+
+      weatherItemListIndex++;
+    }
+
+    // 현재 시각 부터 모레 0시까지의 데이터 추출
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+    LocalDate lastDate = LocalDate.parse(weatherItemList.getFirst().getBaseDate(), dateFormatter)
+        .plusDays(2);
 
     WeatherItem weatherItem;
     WeatherItem nextWeatherItem;
-    int weatherItemListIndex = 0;
 
     do {
       weatherItem = weatherItemList.get(weatherItemListIndex);
@@ -161,7 +180,7 @@ public class WeatherController {
       }
 
       weatherItemListIndex++;
-    } while (!(lastDate.equals(LocalDate.parse(weatherItem.getFcstDate(), formatter))
+    } while (!(lastDate.equals(LocalDate.parse(weatherItem.getFcstDate(), dateFormatter))
         && weatherItem.getFcstTime().equals("0100")));
 
     return chunkedWeatherItemList;
