@@ -152,8 +152,6 @@ public class WeatherController {
       LocalDateTime itemDateTime = LocalDateTime.parse(dateTimeStr, dateTimeFormatter);
 
       if (!itemDateTime.isBefore(nowDateTime)) {
-        System.out.println(itemDateTime);
-        System.out.println(nowDateTime);
         break;
       }
 
