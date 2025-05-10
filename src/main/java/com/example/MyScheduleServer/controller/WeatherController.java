@@ -160,7 +160,7 @@ public class WeatherController {
 
     // 현재 시각 부터 모레 0시까지의 데이터 추출
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-    LocalDate lastDate = LocalDate.parse(weatherItemList.getFirst().getBaseDate(), dateFormatter)
+    LocalDate lastDate = LocalDate.parse(weatherItemList.get(0).getBaseDate(), dateFormatter)
         .plusDays(2);
 
     WeatherItem weatherItem;
